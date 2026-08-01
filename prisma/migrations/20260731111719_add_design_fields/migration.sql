@@ -1,0 +1,7 @@
+-- AlterTable
+ALTER TABLE "Product" ADD COLUMN     "icon" TEXT NOT NULL DEFAULT 'Package',
+ADD COLUMN     "prime" BOOLEAN NOT NULL DEFAULT false,
+ADD COLUMN     "rating" DOUBLE PRECISION NOT NULL DEFAULT 4.5,
+ADD COLUMN     "reviews" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "specs" JSONB,
+ADD COLUMN     "tagline" TEXT;
