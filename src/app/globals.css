@@ -70,10 +70,10 @@
 /* header — bandeau navy façon Amazon, matière verre liquide */
 .lq-header { position: sticky; top: 0; z-index: 40; }
 .lq-topbar {
-  background: var(--nav-navy);
-  backdrop-filter: blur(22px) saturate(160%);
-  -webkit-backdrop-filter: blur(22px) saturate(160%);
-  border-bottom: 1px solid rgba(255,255,255,0.08);
+  background: rgba(18, 22, 28, 0.7);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
   box-shadow: 0 12px 30px -18px rgba(0,0,0,0.7);
 }
 .lq-topbar-inner { display:flex; align-items:center; gap:20px; padding: 12px 24px; max-width:1180px; margin:0 auto; }
@@ -116,13 +116,36 @@
 .lq-btn-danger { background: rgba(255,110,110,0.12); border:1px solid rgba(255,110,110,0.3); color:#ff9b9b; }
 
 /* hero */
-.lq-hero { padding: 60px 0 40px; position:relative; }
+.lq-hero { padding: 60px 0 40px; position: relative;}
+.lq-hero::before {
+  content: "";
+  position: absolute;
+  top: -10%;
+  left: -10%;
+  width: 60%;
+  height: 140%;
+  background: radial-gradient(
+    circle,
+    rgba(82, 214, 242, 0.18) 0%,
+    rgba(124, 92, 255, 0.1) 45%,
+    transparent 70%
+  );
+  filter: blur(60px);
+  pointer-events: none;
+  z-index: 0;
+}
 .lq-hero-grid { display:grid; grid-template-columns: 1.1fr 0.9fr; gap: 40px; align-items:center; }
 .lq-eyebrow { display:inline-flex; align-items:center; gap:8px; font-size:12.5px; font-weight:600; color: var(--accent-cyan); text-transform:uppercase; letter-spacing:0.12em; padding:6px 14px; border-radius:999px; border:1px solid rgba(82,214,242,0.3); background: rgba(82,214,242,0.06); }
 .lq-hero h1 { font-size: 52px; line-height:1.05; margin: 18px 0 16px; }
 .lq-hero p.lead { color: var(--text-muted); font-size:17px; max-width: 480px; line-height:1.6; margin-bottom: 28px; }
 
-.lq-hero-panel { position:relative; height: 420px; padding: 30px; overflow:hidden; }
+.lq-hero-panel {
+  position: relative;
+  height: 420px;
+  padding: 30px;
+  overflow: hidden;
+  border-radius: 28px;
+}
 .lq-shine { position:absolute; top:-50%; left:-60%; width:60%; height:200%; background: linear-gradient(120deg, transparent, rgba(255,255,255,0.28), transparent); transform: rotate(20deg); animation: shine 7s ease-in-out infinite; }
 @keyframes shine { 0% { left:-60%; } 50% { left:120%; } 100% { left:120%; } }
 .lq-orb { position:absolute; border-radius:50%; display:flex; align-items:center; justify-content:center; background: var(--glass-fill-strong); border:1px solid var(--glass-border); backdrop-filter: blur(10px); box-shadow: inset 0 2px 8px rgba(255,255,255,0.3), 0 12px 30px -10px rgba(0,0,0,0.5); }
