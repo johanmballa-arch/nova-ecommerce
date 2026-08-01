@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { CreditCard } from "lucide-react";
 import { fmt } from "@/lib/utils";
 import { useCart } from "@/store/cart";
+import { TrustBadges } from "@/components/TrustBadges";
 
 type Product = {
   id: string;
@@ -100,6 +101,9 @@ export default function CheckoutPage() {
     return (
       <div className="lq-container" style={{ padding: "40px 24px 90px" }}>
         <div className="lq-glass lq-empty">Chargement…</div>
+        <div style={{ marginTop: 22 }}>
+  <TrustBadges />
+</div>
       </div>
     );
   }

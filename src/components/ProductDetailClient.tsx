@@ -6,6 +6,7 @@ import { Minus, Plus, Check, ShoppingCart, Star, Truck } from "lucide-react";
 import { Icon } from "./Icon";
 import { fmt } from "@/lib/utils";
 import { useCart } from "@/store/cart";
+import { TrustBadges } from "./TrustBadges";
 
 type Product = {
   id: string;
@@ -27,7 +28,6 @@ export function ProductDetailClient({ product }: { product: Product }) {
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
 
-  const [euros, cents] = fmt(product.price).split(",");
   const specs = product.specs || {};
 
   return (
@@ -84,9 +84,8 @@ export function ProductDetailClient({ product }: { product: Product }) {
 
           <div className="lq-glass" style={{ padding: 18, marginBottom: 20 }}>
             <div style={{ fontSize: 32, fontWeight: 700, color: "var(--price-red)" }} className="lq-display">
-              {euros}
-              <span style={{ fontSize: 16 }}>,{cents}</span>
-            </div>
+  {fmt(product.price)}
+</div>
             <div
               style={{
                 fontSize: 13,
@@ -172,6 +171,9 @@ export function ProductDetailClient({ product }: { product: Product }) {
               ))}
             </tbody>
           </table>
+          <div style={{ marginTop: 24 }}>
+  <TrustBadges />
+</div>
         </div>
       </div>
     </div>

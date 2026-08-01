@@ -1,2 +1,2 @@
 export const fmt = (n: number) =>
-  n.toLocaleString("fr-FR") + " €";
+  Math.round(n).toLocaleString("fr-FR") + " FCFA";

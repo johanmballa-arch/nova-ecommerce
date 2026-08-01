@@ -26,7 +26,6 @@ export function ProductCard({
   onOpen: (id: string) => void;
   addToCart?: (id: string, qty: number) => void;
 }) {
-  const [euros, cents] = fmt(product.price).split(",");
   const hasImage = product.images && product.images.length > 0;
 
   return (
@@ -53,7 +52,7 @@ export function ProductCard({
       </div>
       <div className="lq-card-tagline">{product.tagline}</div>
       <div className="lq-card-footer">
-        <span className="lq-price">{euros}<span className="cents">,{cents}</span></span>
+        <span className="lq-price">{fmt(product.price)}</span>
       </div>
       {addToCart && (
         <button

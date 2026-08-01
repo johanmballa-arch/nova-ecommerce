@@ -1,5 +1,6 @@
 "use client";
 
+import { TrustBadges } from "./TrustBadges";
 import { useRouter } from "next/navigation";
 import { ChevronRight, Zap } from "lucide-react";
 import { Icon } from "./Icon";
@@ -68,6 +69,10 @@ export function HomeClient({ products }: { products: Product[] }) {
           </div>
         </div>
       </section>
+
+      <section className="lq-container" style={{ marginBottom: 20 }}>
+  <TrustBadges />
+</section>
 
       <section className="lq-container" style={{ margin: "10px 0 30px" }}>
         <div className="lq-cat-row">
