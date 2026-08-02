@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import {
-  LayoutDashboard, Package, ShoppingCart, TrendingUp, Users, Plus, Trash2, Upload,
+  LayoutDashboard, Package, ShoppingCart, TrendingUp, Users, Plus, Trash2, Upload, Pencil, X,
 } from "lucide-react";
 import {
   BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid,
@@ -16,6 +16,7 @@ import { fmt } from "@/lib/utils";
 type Product = {
   id: string;
   name: string;
+  description: string;
   category: string;
   price: number;
   stock: number;
@@ -59,6 +60,7 @@ export default function AdminPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const editFileInputRef = useRef<HTMLInputElement>(null);
 
   const [tab, setTab] = useState<"overview" | "products" | "orders">("overview");
   const [products, setProducts] = useState<Product[]>([]);
@@ -70,6 +72,14 @@ export default function AdminPage() {
     name: "", description: "", category: CATEGORIES[0], price: "", stock: "", icon: "Package",
     imageUrl: "",
   });
+
+  // État de la modale d'édition
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [editForm, setEditForm] = useState({
+    name: "", description: "", category: "", price: "", stock: "", imageUrl: "",
+  });
+  const [editUploading, setEditUploading] = useState(false);
+  const [savingEdit, setSavingEdit] = useState(false);
 
   useEffect(() => {
     if (status === "loading") return;
@@ -188,6 +198,73 @@ export default function AdminPage() {
     });
   };
 
+  // Ouvrir la modale d'édition avec les valeurs actuelles du produit
+  const openEdit = (product: Product) => {
+    setEditingProduct(product);
+    setEditForm({
+      name: product.name,
+      description: product.description,
+      category: product.category,
+      price: String(product.price),
+      stock: String(product.stock),
+      imageUrl: product.images?.[0] || "",
+    });
+  };
+
+  const closeEdit = () => {
+    setEditingProduct(null);
+  };
+
+  const handleEditFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setEditUploading(true);
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await fetch("/api/upload", { method: "POST", body: formData });
+      const data = await res.json();
+      if (res.ok) {
+        setEditForm((f) => ({ ...f, imageUrl: data.url }));
+      } else {
+        alert("Erreur lors de l'upload : " + data.error);
+      }
+    } catch (err) {
+      alert("Erreur lors de l'upload de l'image");
+    } finally {
+      setEditUploading(false);
+    }
+  };
+
+  const saveEdit = async () => {
+    if (!editingProduct) return;
+    setSavingEdit(true);
+    try {
+      const res = await fetch(`/api/products/${editingProduct.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: editForm.name,
+          description: editForm.description,
+          category: editForm.category,
+          price: parseFloat(editForm.price),
+          stock: parseInt(editForm.stock),
+          images: editForm.imageUrl ? [editForm.imageUrl] : [],
+        }),
+      });
+      if (res.ok) {
+        closeEdit();
+        loadData();
+      } else {
+        alert("Erreur lors de la mise à jour du produit");
+      }
+    } finally {
+      setSavingEdit(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="lq-container" style={{ padding: "40px 24px 90px" }}>
@@ -277,7 +354,7 @@ export default function AdminPage() {
               </select>
               <input
                 className="lq-input"
-                placeholder="Prix €"
+                placeholder="Prix FCFA"
                 type="number"
                 value={newP.price}
                 onChange={(e) => setNewP({ ...newP, price: e.target.value })}
@@ -348,9 +425,14 @@ export default function AdminPage() {
                       />
                     </td>
                     <td>
-                      <button className="lq-icon-btn" onClick={() => removeProduct(p.id)}>
-                        <Trash2 size={14} />
-                      </button>
+                      <div style={{ display: "flex", gap: 6 }}>
+                        <button className="lq-icon-btn" onClick={() => openEdit(p)} title="Modifier">
+                          <Pencil size={14} />
+                        </button>
+                        <button className="lq-icon-btn" onClick={() => removeProduct(p.id)} title="Supprimer">
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -395,6 +477,103 @@ export default function AdminPage() {
               )}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {/* Modale de modification de produit */}
+      {editingProduct && (
+        <div className="lq-modal-backdrop" onClick={closeEdit}>
+          <div className="lq-glass lq-modal" onClick={(e) => e.stopPropagation()}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
+              <div className="lq-display" style={{ fontSize: 17 }}>Modifier le produit</div>
+              <button className="lq-icon-btn" onClick={closeEdit}>
+                <X size={16} />
+              </button>
+            </div>
+
+            <div className="lq-form-grid" style={{ marginBottom: 14 }}>
+              <div className="lq-field" style={{ gridColumn: "1 / -1" }}>
+                <label>Nom du produit</label>
+                <input
+                  className="lq-input"
+                  value={editForm.name}
+                  onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                />
+              </div>
+              <div className="lq-field" style={{ gridColumn: "1 / -1" }}>
+                <label>Description</label>
+                <textarea
+                  className="lq-input"
+                  style={{ minHeight: 80, resize: "vertical", fontFamily: "inherit" }}
+                  value={editForm.description}
+                  onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                />
+              </div>
+              <div className="lq-field">
+                <label>Catégorie</label>
+                <select
+                  className="lq-select"
+                  style={{ width: "100%" }}
+                  value={editForm.category}
+                  onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}
+                >
+                  {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+                </select>
+              </div>
+              <div className="lq-field">
+                <label>Prix (FCFA)</label>
+                <input
+                  className="lq-input"
+                  type="number"
+                  value={editForm.price}
+                  onChange={(e) => setEditForm({ ...editForm, price: e.target.value })}
+                />
+              </div>
+              <div className="lq-field">
+                <label>Stock</label>
+                <input
+                  className="lq-input"
+                  type="number"
+                  value={editForm.stock}
+                  onChange={(e) => setEditForm({ ...editForm, stock: e.target.value })}
+                />
+              </div>
+            </div>
+
+            <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 20 }}>
+              <input
+                ref={editFileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleEditFileSelect}
+                style={{ display: "none" }}
+                id="edit-product-image-input"
+              />
+              <label
+                htmlFor="edit-product-image-input"
+                className="lq-btn lq-btn-ghost"
+                style={{ cursor: "pointer" }}
+              >
+                <Upload size={15} /> {editUploading ? "Envoi en cours…" : "Changer l'image"}
+              </label>
+              {editForm.imageUrl && (
+                <img
+                  src={editForm.imageUrl}
+                  alt="Aperçu"
+                  style={{ width: 52, height: 52, objectFit: "cover", borderRadius: 8, border: "1px solid rgba(255,255,255,0.14)" }}
+                />
+              )}
+            </div>
+
+            <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
+              <button className="lq-btn lq-btn-ghost" onClick={closeEdit}>
+                Annuler
+              </button>
+              <button className="lq-btn lq-btn-primary" onClick={saveEdit} disabled={savingEdit || editUploading}>
+                {savingEdit ? "Enregistrement…" : "Enregistrer les modifications"}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

@@ -235,6 +235,67 @@ a { text-decoration: none; color: inherit; }
 .lq-rating .count { color: var(--accent-cyan); font-weight:600; }
 .lq-card-cta { margin-top:4px; width:100%; justify-content:center; padding: 8px 14px; font-size:12.5px; }
 
+/* carte produit plein cadre — image en fond, texte incrusté */
+.lq-card-full {
+  position: relative;
+  height: 280px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  cursor: pointer;
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 20px 45px -22px rgba(0,0,0,0.6);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.lq-card-full:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 26px 55px -20px rgba(255,164,28,0.25);
+}
+.lq-card-full-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.lq-card-full-fallback {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.92);
+  color: #1c2b45;
+}
+.lq-card-full-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 2;
+}
+.lq-card-full-overlay {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  padding: 16px 14px 14px;
+  background: linear-gradient(180deg, transparent 0%, rgba(5,7,13,0.4) 40%, rgba(5,7,13,0.94) 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  z-index: 1;
+}
+.lq-card-full-name {
+  font-weight: 600;
+  font-size: 14.5px;
+  color: #fff;
+  line-height: 1.25;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+.lq-card-full-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 2px;
+}
+
 /* fil d'ariane */
 .lq-breadcrumb { display:flex; align-items:center; gap:6px; font-size:12.5px; color:var(--text-muted); margin-bottom:16px; flex-wrap:wrap; }
 .lq-breadcrumb button { background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:12.5px; padding:0; }
@@ -274,9 +335,53 @@ a { text-decoration: none; color: inherit; }
 .lq-input:focus, .lq-select:focus { border-color: var(--accent-cyan); }
 .lq-input::placeholder { color: var(--text-faint); }
 
-/* product detail */
+/* product detail — image plein cadre avec texte incrusté */
 .lq-detail-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 44px; }
-.lq-detail-visual { height: 380px; display:flex; align-items:center; justify-content:center; color: var(--accent-cyan); }
+.lq-detail-visual {
+  position: relative;
+  height: 460px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 20px 50px -20px rgba(0,0,0,0.6);
+}
+.lq-detail-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.lq-detail-fallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.92);
+  color: #1c2b45;
+}
+.lq-detail-badge-top {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  z-index: 2;
+}
+.lq-detail-overlay {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  padding: 28px 24px 22px;
+  background: linear-gradient(180deg, transparent 0%, rgba(5,7,13,0.35) 35%, rgba(5,7,13,0.92) 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.lq-detail-overlay-title {
+  font-size: 30px;
+  color: #fff;
+  margin: 0;
+  line-height: 1.1;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.4);
+}
 .lq-spec-table { width:100%; border-collapse: collapse; margin-top:18px; }
 .lq-spec-table tr { border-bottom: 1px solid rgba(255,255,255,0.08); }
 .lq-spec-table td { padding: 11px 4px; font-size:13.5px; }
@@ -319,9 +424,197 @@ table.lq-admin-table tr:hover td { background: rgba(255,255,255,0.03); }
 .lq-empty { text-align:center; padding: 70px 20px; color: var(--text-muted); }
 .lq-footer { text-align:center; padding: 50px 20px 30px; color: var(--text-faint); font-size:13px; position:relative; z-index:1; }
 
+/* modale d'édition produit */
+.lq-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(5,7,13,0.7);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.lq-modal {
+  width: 100%;
+  max-width: 560px;
+  max-height: 88vh;
+  overflow-y: auto;
+  padding: 26px;
+}
+
 @media (max-width: 860px) {
   .lq-hero-grid, .lq-detail-grid { grid-template-columns: 1fr; }
   .lq-hero h1 { font-size:36px; }
   .lq-nav { display:none; }
   .lq-form-grid { grid-template-columns: 1fr; }
+}
+
+/* ===== Effet de clic (feedback tactile) sur tous les éléments interactifs ===== */
+.lq-btn,
+.lq-icon-btn,
+.lq-nav-link,
+.lq-catstrip-link,
+.lq-tab,
+.lq-filter-cat,
+.lq-price-chip,
+.lq-cat-pill,
+.lq-card,
+.lq-card-full,
+.lq-logo,
+.lq-deliver {
+  transition: transform .15s ease, box-shadow .15s ease, background .15s ease, opacity .15s ease, border-color .15s ease;
+}
+
+.lq-btn:active,
+.lq-icon-btn:active,
+.lq-nav-link:active,
+.lq-catstrip-link:active,
+.lq-tab:active,
+.lq-filter-cat:active,
+.lq-price-chip:active,
+.lq-status-pill:active {
+  transform: scale(0.94);
+}
+
+.lq-card:active {
+  transform: scale(0.985) translateY(-1px);
+}
+
+.lq-card-full:active {
+  transform: scale(0.98);
+}
+
+.lq-cat-pill:active {
+  transform: scale(0.93) translateY(-1px);
+}
+
+.lq-logo:active {
+  transform: scale(0.95);
+}
+
+/* Le bouton primaire garde son effet de "lift" au survol, mais s'écrase légèrement au clic */
+.lq-btn-primary:active {
+  transform: scale(0.95) translateY(0);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.6), 0 4px 14px -6px rgba(255,140,0,0.6);
+}
+
+.lq-btn-buy:active {
+  transform: scale(0.95);
+}
+
+.lq-btn-ghost:active {
+  transform: scale(0.95);
+}
+
+/* Empêche le halo de sélection bleu disgracieux au clic sur mobile/tactile */
+.lq-btn, .lq-icon-btn, .lq-nav-link, .lq-catstrip-link, .lq-tab,
+.lq-filter-cat, .lq-price-chip, .lq-cat-pill, .lq-card, .lq-card-full,
+.lq-logo, .lq-status-pill {
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+/* ===================================================================
+   RESPONSIVE MOBILE
+   =================================================================== */
+
+@media (max-width: 768px) {
+  /* Header : on masque le superflu, on garde l'essentiel */
+  .lq-topbar-inner {
+    gap: 10px;
+    padding: 10px 14px;
+    flex-wrap: nowrap;
+  }
+  .lq-deliver { display: none; }
+  .lq-logo { font-size: 18px; }
+  .lq-logo-mark { width: 26px; height: 26px; }
+
+  .lq-searchbar { height: 40px; order: 3; flex-basis: 100%; }
+  .lq-searchbar select { display: none; }
+  .lq-searchbar input { font-size: 13px; padding: 0 12px; }
+
+  .lq-topbar-right { gap: 6px; }
+  .lq-nav-link small { display: none; }
+  .lq-nav-link { font-size: 0; padding: 8px; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; }
+  .lq-nav-link svg { margin: 0 !important; }
+
+  .lq-topbar-inner {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .lq-logo { flex: 1 1 auto; }
+
+  .lq-catstrip-inner { padding: 8px 14px; }
+  .lq-catstrip-link { font-size: 12px; padding: 6px 11px; }
+
+  /* Container général : marges réduites */
+  .lq-container { padding: 0 14px; }
+
+  /* Hero */
+  .lq-hero { padding: 30px 0 24px; }
+  .lq-hero h1 { font-size: 30px; margin: 14px 0 12px; }
+  .lq-hero p.lead { font-size: 14.5px; margin-bottom: 20px; }
+  .lq-hero-grid { gap: 20px; }
+  .lq-hero-panel { height: 220px; padding: 16px; border-radius: 20px; }
+  .lq-eyebrow { font-size: 11px; padding: 5px 11px; }
+  .lq-btn { font-size: 13.5px; padding: 11px 18px; }
+
+  /* Catégories en pilules (accueil) */
+  .lq-cat-pill { min-width: 84px; padding: 12px 14px; }
+  .lq-cat-pill .lq-cat-icon { width: 36px; height: 36px; }
+  .lq-cat-pill span { font-size: 11px; }
+
+  /* Grille produits : cartes plus petites, 2 par ligne */
+  .lq-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .lq-card-full { height: 210px; }
+  .lq-card-full-name { font-size: 13px; }
+  .lq-card-full-overlay { padding: 12px 10px 10px; }
+  .lq-card-cta { font-size: 11.5px; padding: 7px 10px; }
+
+  .lq-card { padding: 10px; }
+  .lq-card-visual { height: 90px; }
+  .lq-card-name { font-size: 13px; }
+  .lq-price { font-size: 16px; }
+
+  /* Sections titres */
+  .lq-section-title h2 { font-size: 20px; }
+  .lq-deals { flex-direction: column; align-items: flex-start; gap: 8px; padding: 12px 16px; }
+
+  /* Fiche produit */
+  .lq-detail-visual { height: 300px; }
+  .lq-detail-overlay-title { font-size: 22px; }
+  .lq-detail-grid { gap: 20px; }
+
+  /* Catalogue : filtres empilés */
+  .lq-filters { padding: 12px 14px; gap: 8px; }
+  .lq-catalog-layout { gap: 14px; }
+  .lq-sidebar { padding: 14px; }
+
+  /* Panier / résumé */
+  .lq-cart-row { padding: 12px; gap: 10px; flex-wrap: wrap; }
+  .lq-cart-visual { width: 48px; height: 48px; }
+
+  /* Formulaires : une colonne */
+  .lq-form-grid { grid-template-columns: 1fr; }
+
+  /* Admin : tables déjà scrollables horizontalement */
+  .lq-stat-card { padding: 14px; }
+  .lq-stat-card .value { font-size: 20px; }
+  table.lq-admin-table { font-size: 12.5px; }
+
+  /* Modale plein écran sur mobile */
+  .lq-modal { max-width: 100%; padding: 18px; max-height: 92vh; }
+  .lq-modal-backdrop { padding: 10px; }
+
+  .lq-tab-row { overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; }
+  .lq-tab-row::-webkit-scrollbar { display: none; }
+  .lq-tab { white-space: nowrap; flex: 0 0 auto; font-size: 12.5px; padding: 8px 13px; }
+}
+
+@media (max-width: 400px) {
+  .lq-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .lq-hero h1 { font-size: 26px; }
+  .lq-card-full { height: 180px; }
 }

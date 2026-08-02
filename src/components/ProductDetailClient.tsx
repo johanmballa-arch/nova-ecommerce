@@ -20,6 +20,7 @@ type Product = {
   tagline: string | null;
   prime: boolean;
   specs: Record<string, string> | null;
+  images?: string[];
 };
 
 export function ProductDetailClient({ product }: { product: Product }) {
@@ -28,6 +29,7 @@ export function ProductDetailClient({ product }: { product: Product }) {
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
 
+  const hasImage = product.images && product.images.length > 0;
   const specs = product.specs || {};
 
   return (
@@ -43,49 +45,42 @@ export function ProductDetailClient({ product }: { product: Product }) {
       </div>
 
       <div className="lq-detail-grid">
-        <div
-          className="lq-glass lq-detail-visual"
-          style={{ background: "rgba(255,255,255,0.92)", color: "#1c2b45", overflow: "hidden" }}
-        >
-          {product.prime && (
-            <span className="lq-prime-badge" style={{ position: "absolute", top: 20, left: 20, zIndex: 1 }}>
-              Livraison rapide
-            </span>
-          )}
-          {(product as any).images && (product as any).images.length > 0 ? (
-            <img
-              src={(product as any).images[0]}
-              alt={product.name}
-              style={{ width: "100%", height: "100%", objectFit: "cover" }}
-            />
+        {/* Visuel plein cadre avec texte incrusté */}
+        <div className="lq-detail-visual">
+          {hasImage ? (
+            <img src={product.images![0]} alt={product.name} className="lq-detail-img" />
           ) : (
-            <Icon name={product.icon} size={140} />
+            <div className="lq-detail-fallback">
+              <Icon name={product.icon} size={140} />
+            </div>
           )}
-        </div>
-        <div>
-          <div className="lq-card-cat">{product.category}</div>
-          <h1 className="lq-display" style={{ fontSize: 34, margin: "8px 0" }}>{product.name}</h1>
-          <div className="lq-rating" style={{ fontSize: 14 }}>
-            {[1, 2, 3, 4, 5].map((i) => (
-              <Star
-                key={i}
-                size={15}
-                fill={i <= Math.round(product.rating) ? "#ffa41c" : "none"}
-                color="#ffa41c"
-              />
-            ))}
-            <span className="count">
-              {product.rating} · {product.reviews.toLocaleString("fr-FR")} avis
+
+          {product.prime && <span className="lq-prime-badge lq-detail-badge-top">Livraison rapide</span>}
+
+          <div className="lq-detail-overlay">
+            <span className="lq-card-cat" style={{ background: "rgba(0,0,0,0.35)", borderColor: "rgba(255,255,255,0.25)", color: "#fff" }}>
+              {product.category}
             </span>
+            <h1 className="lq-display lq-detail-overlay-title">{product.name}</h1>
+            <div className="lq-rating" style={{ color: "rgba(255,255,255,0.85)" }}>
+              {[1, 2, 3, 4, 5].map((i) => (
+                <Star key={i} size={14} fill={i <= Math.round(product.rating) ? "#ffa41c" : "none"} color="#ffa41c" />
+              ))}
+              <span style={{ color: "#fff" }}>{product.rating} · {product.reviews.toLocaleString("fr-FR")} avis</span>
+            </div>
           </div>
-          <p style={{ color: "var(--text-muted)", margin: "16px 0", lineHeight: 1.6 }}>
+        </div>
+
+        {/* Colonne infos / achat */}
+        <div>
+          <p style={{ color: "var(--text-muted)", margin: "0 0 16px", lineHeight: 1.6 }}>
             {product.tagline}
           </p>
 
           <div className="lq-glass" style={{ padding: 18, marginBottom: 20 }}>
-            <div style={{ fontSize: 32, fontWeight: 700, color: "var(--price-red)" }} className="lq-display">
-  {fmt(product.price)}
-</div>
+            <div style={{ fontSize: 30, fontWeight: 700, color: "var(--price-red)" }} className="lq-display">
+              {fmt(product.price)}
+            </div>
             <div
               style={{
                 fontSize: 13,
@@ -171,10 +166,11 @@ export function ProductDetailClient({ product }: { product: Product }) {
               ))}
             </tbody>
           </table>
-          <div style={{ marginTop: 24 }}>
-  <TrustBadges />
-</div>
         </div>
+      </div>
+
+      <div style={{ marginTop: 24 }}>
+        <TrustBadges />
       </div>
     </div>
   );

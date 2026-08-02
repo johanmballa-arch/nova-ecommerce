@@ -29,39 +29,43 @@ export function ProductCard({
   const hasImage = product.images && product.images.length > 0;
 
   return (
-    <div className="lq-glass lq-card" onClick={() => onOpen(product.id)}>
-      <div className="lq-card-visual">
-        {product.prime && <span className="lq-prime-badge">Livraison rapide</span>}
-        {hasImage ? (
-          <img
-            src={product.images![0]}
-            alt={product.name}
-            style={{ width: "100%", height: "100%", objectFit: "cover" }}
-          />
-        ) : (
-          <Icon name={product.icon} size={44} />
+    <div className="lq-card-full" onClick={() => onOpen(product.id)}>
+      {hasImage ? (
+        <img src={product.images![0]} alt={product.name} className="lq-card-full-img" />
+      ) : (
+        <div className="lq-card-full-fallback">
+          <Icon name={product.icon} size={48} />
+        </div>
+      )}
+
+      {product.prime && <span className="lq-prime-badge lq-card-full-badge">Livraison rapide</span>}
+
+      <div className="lq-card-full-overlay">
+        <span className="lq-card-cat" style={{ background: "rgba(0,0,0,0.4)", borderColor: "rgba(255,255,255,0.25)", color: "#fff" }}>
+          {product.category}
+        </span>
+        <div className="lq-card-full-name lq-display">{product.name}</div>
+        <div className="lq-rating" style={{ color: "rgba(255,255,255,0.85)" }}>
+          {[1, 2, 3, 4, 5].map((i) => (
+            <Star key={i} size={12} fill={i <= Math.round(product.rating) ? "#ffa41c" : "none"} color="#ffa41c" />
+          ))}
+          <span style={{ color: "#fff" }}>{product.reviews.toLocaleString("fr-FR")}</span>
+        </div>
+        <div className="lq-card-full-footer">
+          <span className="lq-price" style={{ color: "#fff" }}>{fmt(product.price)}</span>
+        </div>
+        {addToCart && (
+          <button
+            className="lq-btn lq-btn-primary lq-card-cta"
+            onClick={(e) => {
+              e.stopPropagation();
+              addToCart(product.id, 1);
+            }}
+          >
+            <ShoppingCart size={14} /> Ajouter au panier
+          </button>
         )}
       </div>
-      <div className="lq-card-cat">{product.category}</div>
-      <div className="lq-card-name lq-display">{product.name}</div>
-      <div className="lq-rating">
-        {[1, 2, 3, 4, 5].map((i) => (
-          <Star key={i} size={12} fill={i <= Math.round(product.rating) ? "#ffa41c" : "none"} color="#ffa41c" />
-        ))}
-        <span className="count">{product.reviews.toLocaleString("fr-FR")}</span>
-      </div>
-      <div className="lq-card-tagline">{product.tagline}</div>
-      <div className="lq-card-footer">
-        <span className="lq-price">{fmt(product.price)}</span>
-      </div>
-      {addToCart && (
-        <button
-          className="lq-btn lq-btn-primary lq-card-cta"
-          onClick={(e) => { e.stopPropagation(); addToCart(product.id, 1); }}
-        >
-          <ShoppingCart size={14} /> Ajouter au panier
-        </button>
-      )}
     </div>
   );
 }
