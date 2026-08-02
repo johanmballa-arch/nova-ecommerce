@@ -92,10 +92,14 @@ export function Header() {
 
       <div className="lq-catstrip">
         <div className="lq-catstrip-inner">
-          <Link href="/">Accueil</Link>
-          <Link href="/catalog">Tout le catalogue</Link>
+          <Link href="/" className="lq-catstrip-link">Accueil</Link>
+          <Link href="/catalog" className="lq-catstrip-link">Tout le catalogue</Link>
           {CATEGORIES.map((c) => (
-            <Link key={c} href={`/catalog?category=${encodeURIComponent(c)}`}>
+            <Link
+              key={c}
+              href={`/catalog?category=${encodeURIComponent(c)}`}
+              className="lq-catstrip-link"
+            >
               {c}
             </Link>
           ))}
