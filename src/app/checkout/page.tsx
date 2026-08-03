@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { CreditCard } from "lucide-react";
 import { fmt } from "@/lib/utils";
 import { useCart } from "@/store/cart";
@@ -15,6 +16,7 @@ type Product = {
 
 export default function CheckoutPage() {
   const router = useRouter();
+  const { data: session, status } = useSession();
   const { items } = useCart();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -23,6 +25,25 @@ export default function CheckoutPage() {
   const [form, setForm] = useState({
     name: "", email: "", address: "", city: "", zip: "",
   });
+
+  // Redirige vers /login si pas connecté
+  useEffect(() => {
+    if (status === "loading") return;
+    if (!session) {
+      router.push("/login?redirect=/checkout");
+    }
+  }, [session, status, router]);
+
+  // Pré-remplit le nom et l'e-mail dès que la session est connue
+  useEffect(() => {
+    if (session?.user) {
+      setForm((f) => ({
+        ...f,
+        name: session.user?.name || f.name,
+        email: session.user?.email || f.email,
+      }));
+    }
+  }, [session]);
 
   useEffect(() => {
     fetch("/api/products")
@@ -38,7 +59,7 @@ export default function CheckoutPage() {
     .filter((i) => i.product);
 
   const subtotal = cartItems.reduce((s, i) => s + i.product!.price * i.qty, 0);
-  const shipping = subtotal > 0 && subtotal < 500 ? 9.9 : 0;
+  const shipping = subtotal > 0 && subtotal < 100000 ? 5000 : 0;
   const total = subtotal + shipping;
 
   const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -51,7 +72,6 @@ export default function CheckoutPage() {
     setSubmitting(true);
 
     try {
-      // 1. Créer la commande en base (statut PENDING)
       const orderRes = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -70,7 +90,6 @@ export default function CheckoutPage() {
       if (!orderRes.ok) throw new Error("Erreur lors de la création de la commande");
       const order = await orderRes.json();
 
-      // 2. Créer la session de paiement Stripe
       const stripeRes = await fetch("/api/checkout/stripe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -88,7 +107,6 @@ export default function CheckoutPage() {
       if (!stripeRes.ok) throw new Error("Erreur lors de la création du paiement");
       const { url } = await stripeRes.json();
 
-      // 3. Rediriger vers la page de paiement Stripe
       window.location.href = url;
     } catch (err) {
       console.error(err);
@@ -97,13 +115,18 @@ export default function CheckoutPage() {
     }
   };
 
+  if (status === "loading" || !session) {
+    return (
+      <div className="lq-container" style={{ padding: "40px 24px 90px" }}>
+        <div className="lq-glass lq-empty">Vérification de la connexion…</div>
+      </div>
+    );
+  }
+
   if (loading) {
     return (
       <div className="lq-container" style={{ padding: "40px 24px 90px" }}>
         <div className="lq-glass lq-empty">Chargement…</div>
-        <div style={{ marginTop: 22 }}>
-  <TrustBadges />
-</div>
       </div>
     );
   }
@@ -159,6 +182,10 @@ export default function CheckoutPage() {
           <p style={{ fontSize: 12.5, color: "var(--text-faint)" }}>
             Tu seras redirigé vers une page de paiement sécurisée Stripe. Aucune donnée bancaire n'est stockée sur nos serveurs.
           </p>
+
+          <div style={{ marginTop: 22 }}>
+            <TrustBadges />
+          </div>
         </div>
 
         <div className="lq-glass" style={{ padding: 22 }}>

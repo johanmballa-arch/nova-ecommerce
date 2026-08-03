@@ -10,6 +10,7 @@ function LoginForm() {
   const searchParams = useSearchParams();
   const justRegistered = searchParams.get("registered") === "true";
   const justVerified = searchParams.get("verified") === "true";
+  const redirectTo = searchParams.get("redirect") || "/account";
 
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
@@ -39,7 +40,7 @@ function LoginForm() {
       return;
     }
 
-    router.push("/account");
+    router.push(redirectTo);
     router.refresh();
   };
 
@@ -57,6 +58,11 @@ function LoginForm() {
             <LogIn size={26} color="#060812" />
           </div>
           <h2 className="lq-display">Connexion</h2>
+          {redirectTo === "/checkout" && (
+            <p style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 8 }}>
+              Connecte-toi pour finaliser ta commande
+            </p>
+          )}
         </div>
 
         {justRegistered && (
@@ -91,7 +97,7 @@ function LoginForm() {
 
         <p style={{ textAlign: "center", fontSize: 13, color: "var(--text-muted)", marginTop: 16 }}>
           Pas encore de compte ?{" "}
-          <a href="/signup" style={{ color: "var(--accent-cyan)" }}>Créer un compte</a>
+          <a href={`/signup?redirect=${encodeURIComponent(redirectTo)}`} style={{ color: "var(--accent-cyan)" }}>Créer un compte</a>
         </p>
       </form>
     </div>
