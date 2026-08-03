@@ -9,6 +9,7 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const justRegistered = searchParams.get("registered") === "true";
+  const justVerified = searchParams.get("verified") === "true";
 
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
@@ -29,6 +30,10 @@ function LoginForm() {
     });
 
     if (res?.error) {
+      if (res.error.includes("EMAIL_NOT_VERIFIED")) {
+        router.push(`/verify?email=${encodeURIComponent(form.email)}`);
+        return;
+      }
       setError("E-mail ou mot de passe incorrect");
       setLoading(false);
       return;
@@ -57,6 +62,11 @@ function LoginForm() {
         {justRegistered && (
           <div style={{ background: "rgba(126,224,160,0.12)", color: "#7ee0a0", padding: 10, borderRadius: 8, fontSize: 13, marginBottom: 16 }}>
             Compte créé avec succès ! Connecte-toi.
+          </div>
+        )}
+        {justVerified && (
+          <div style={{ background: "rgba(126,224,160,0.12)", color: "#7ee0a0", padding: 10, borderRadius: 8, fontSize: 13, marginBottom: 16 }}>
+            E-mail vérifié avec succès ! Connecte-toi.
           </div>
         )}
 

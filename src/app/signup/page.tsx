@@ -33,7 +33,7 @@ export default function SignupPage() {
         return;
       }
 
-      router.push("/login?registered=true");
+      router.push(`/verify?email=${encodeURIComponent(form.email)}`);
     } catch (err) {
       setError("Une erreur est survenue");
       setLoading(false);

@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
+import { sendVerificationEmail } from "@/lib/email";
+
+function generateCode() {
+  return Math.floor(100000 + Math.random() * 900000).toString(); // code à 6 chiffres
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -30,6 +35,8 @@ export async function POST(request: NextRequest) {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
+    const code = generateCode();
+    const expires = new Date(Date.now() + 15 * 60 * 1000); // expire dans 15 min
 
     const user = await prisma.user.create({
       data: {
@@ -37,8 +44,13 @@ export async function POST(request: NextRequest) {
         email,
         password: hashedPassword,
         role: "CLIENT",
+        emailVerified: false,
+        verificationCode: code,
+        verificationCodeExpires: expires,
       },
     });
+
+    await sendVerificationEmail(email, code);
 
     return NextResponse.json(
       { id: user.id, email: user.email, name: user.name },
