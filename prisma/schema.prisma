@@ -7,17 +7,33 @@ datasource db {
 }
 
 model User {
-  id                String    @id @default(cuid())
-  email             String    @unique
-  password          String
-  name              String?
-  role              Role      @default(CLIENT)
-  emailVerified     Boolean   @default(false)
-  verificationCode  String?
-  verificationCodeExpires DateTime?
-  orders            Order[]
-  reviews           Review[]
-  createdAt         DateTime  @default(now())
+  id        String    @id @default(cuid())
+  email     String    @unique
+  password  String
+  name      String?
+  role      Role      @default(CLIENT)
+  emailVerified Boolean @default(true)
+  orders    Order[]
+  reviews   Review[]
+  createdAt DateTime  @default(now())
+}
+
+model PendingSignup {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String
+  code      String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model PasswordReset {
+  id        String   @id @default(cuid())
+  email     String
+  code      String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
 }
 
 enum Role {

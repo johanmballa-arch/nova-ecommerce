@@ -13,34 +13,41 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const user = await prisma.user.findUnique({ where: { email } });
+    const pending = await prisma.pendingSignup.findUnique({ where: { email } });
 
-    if (!user) {
-      return NextResponse.json({ error: "Compte introuvable" }, { status: 404 });
+    if (!pending) {
+      return NextResponse.json(
+        { error: "Aucune inscription en attente pour cet e-mail" },
+        { status: 404 }
+      );
     }
 
-    if (user.emailVerified) {
-      return NextResponse.json({ error: "E-mail déjà vérifié" }, { status: 400 });
-    }
-
-    if (user.verificationCode !== code) {
+    if (pending.code !== code) {
       return NextResponse.json({ error: "Code incorrect" }, { status: 400 });
     }
 
-    if (!user.verificationCodeExpires || user.verificationCodeExpires < new Date()) {
+    if (pending.expiresAt < new Date()) {
       return NextResponse.json({ error: "Ce code a expiré" }, { status: 400 });
     }
 
-    await prisma.user.update({
-      where: { email },
+    // Le code est valide : on crée vraiment le compte
+    const user = await prisma.user.create({
       data: {
+        name: pending.name,
+        email: pending.email,
+        password: pending.password,
+        role: "CLIENT",
         emailVerified: true,
-        verificationCode: null,
-        verificationCodeExpires: null,
       },
     });
 
-    return NextResponse.json({ success: true });
+    // Nettoyage : on supprime la demande en attente
+    await prisma.pendingSignup.delete({ where: { email } });
+
+    return NextResponse.json({
+      success: true,
+      email: user.email,
+    });
   } catch (error) {
     console.error(error);
     return NextResponse.json(

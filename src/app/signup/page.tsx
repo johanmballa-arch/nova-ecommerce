@@ -33,7 +33,9 @@ export default function SignupPage() {
         return;
       }
 
-      router.push(`/verify?email=${encodeURIComponent(form.email)}`);
+      router.push(
+        `/verify?email=${encodeURIComponent(form.email)}&pw=${encodeURIComponent(form.password)}`
+      );
     } catch (err) {
       setError("Une erreur est survenue");
       setLoading(false);
@@ -76,7 +78,7 @@ export default function SignupPage() {
         </div>
 
         <button className="lq-btn lq-btn-primary" style={{ width: "100%", justifyContent: "center" }} disabled={loading}>
-          {loading ? "Création…" : "Créer mon compte"}
+          {loading ? "Envoi du code…" : "Créer mon compte"}
         </button>
 
         <p style={{ textAlign: "center", fontSize: 13, color: "var(--text-muted)", marginTop: 16 }}>

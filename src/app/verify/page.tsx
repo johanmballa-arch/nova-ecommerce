@@ -2,12 +2,14 @@
 
 import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { signIn } from "next-auth/react";
 import { MailCheck } from "lucide-react";
 
 function VerifyForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const email = searchParams.get("email") || "";
+  const password = searchParams.get("pw") || ""; // utilisé uniquement pour l'auto-connexion juste après inscription
 
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
@@ -34,6 +36,22 @@ function VerifyForm() {
       return;
     }
 
+    // Compte créé avec succès : on tente une connexion automatique si on a le mot de passe
+    if (password) {
+      const signInRes = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
+
+      if (!signInRes?.error) {
+        router.push("/");
+        router.refresh();
+        return;
+      }
+    }
+
+    // Sinon (mot de passe non disponible), on renvoie vers la connexion classique
     router.push("/login?verified=true");
   };
 
@@ -65,9 +83,10 @@ function VerifyForm() {
           >
             <MailCheck size={26} color="#060812" />
           </div>
-          <h2 className="lq-display">Vérifie ton e-mail</h2>
+          <h2 className="lq-display">Confirme ton inscription</h2>
           <p style={{ color: "var(--text-muted)", fontSize: 13.5, marginTop: 8 }}>
-            Un code à 6 chiffres a été envoyé à <strong style={{ color: "var(--text-primary)" }}>{email}</strong>
+            Un code à 6 chiffres a été envoyé à <strong style={{ color: "var(--text-primary)" }}>{email}</strong>.
+            Ton compte sera créé une fois ce code validé.
           </p>
         </div>
 
@@ -96,7 +115,7 @@ function VerifyForm() {
         </div>
 
         <button className="lq-btn lq-btn-primary" style={{ width: "100%", justifyContent: "center" }} disabled={loading}>
-          {loading ? "Vérification…" : "Vérifier mon compte"}
+          {loading ? "Validation…" : "Valider et créer mon compte"}
         </button>
 
         <button

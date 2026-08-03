@@ -11,20 +11,20 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { email } = body;
 
-    const user = await prisma.user.findUnique({ where: { email } });
-    if (!user) {
-      return NextResponse.json({ error: "Compte introuvable" }, { status: 404 });
-    }
-    if (user.emailVerified) {
-      return NextResponse.json({ error: "E-mail déjà vérifié" }, { status: 400 });
+    const pending = await prisma.pendingSignup.findUnique({ where: { email } });
+    if (!pending) {
+      return NextResponse.json(
+        { error: "Aucune inscription en attente pour cet e-mail" },
+        { status: 404 }
+      );
     }
 
     const code = generateCode();
-    const expires = new Date(Date.now() + 15 * 60 * 1000);
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
 
-    await prisma.user.update({
+    await prisma.pendingSignup.update({
       where: { email },
-      data: { verificationCode: code, verificationCodeExpires: expires },
+      data: { code, expiresAt },
     });
 
     await sendVerificationEmail(email, code);

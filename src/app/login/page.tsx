@@ -10,6 +10,7 @@ function LoginForm() {
   const searchParams = useSearchParams();
   const justRegistered = searchParams.get("registered") === "true";
   const justVerified = searchParams.get("verified") === "true";
+  const justReset = searchParams.get("reset") === "true";
   const redirectTo = searchParams.get("redirect") || "/account";
 
   const [form, setForm] = useState({ email: "", password: "" });
@@ -31,10 +32,6 @@ function LoginForm() {
     });
 
     if (res?.error) {
-      if (res.error.includes("EMAIL_NOT_VERIFIED")) {
-        router.push(`/verify?email=${encodeURIComponent(form.email)}`);
-        return;
-      }
       setError("E-mail ou mot de passe incorrect");
       setLoading(false);
       return;
@@ -75,6 +72,11 @@ function LoginForm() {
             E-mail vérifié avec succès ! Connecte-toi.
           </div>
         )}
+        {justReset && (
+          <div style={{ background: "rgba(126,224,160,0.12)", color: "#7ee0a0", padding: 10, borderRadius: 8, fontSize: 13, marginBottom: 16 }}>
+            Mot de passe réinitialisé avec succès ! Connecte-toi.
+          </div>
+        )}
 
         {error && (
           <div style={{ background: "rgba(255,80,80,0.12)", color: "#ff8080", padding: 10, borderRadius: 8, fontSize: 13, marginBottom: 16 }}>
@@ -86,9 +88,15 @@ function LoginForm() {
           <label>E-mail</label>
           <input className="lq-input" type="email" value={form.email} onChange={set("email")} placeholder="awa@mail.com" required />
         </div>
-        <div className="lq-field" style={{ marginBottom: 20 }}>
+        <div className="lq-field" style={{ marginBottom: 10 }}>
           <label>Mot de passe</label>
           <input className="lq-input" type="password" value={form.password} onChange={set("password")} placeholder="••••••••" required />
+        </div>
+
+        <div style={{ textAlign: "right", marginBottom: 20 }}>
+          <a href="/forgot-password" style={{ color: "var(--accent-cyan)", fontSize: 12.5 }}>
+            Mot de passe oublié ?
+          </a>
         </div>
 
         <button className="lq-btn lq-btn-primary" style={{ width: "100%", justifyContent: "center" }} disabled={loading}>

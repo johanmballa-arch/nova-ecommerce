@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { sendVerificationEmail } from "@/lib/email";
 
 function generateCode() {
-  return Math.floor(100000 + Math.random() * 900000).toString(); // code à 6 chiffres
+  return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
 export async function POST(request: NextRequest) {
@@ -36,26 +36,18 @@ export async function POST(request: NextRequest) {
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const code = generateCode();
-    const expires = new Date(Date.now() + 15 * 60 * 1000); // expire dans 15 min
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
 
-    const user = await prisma.user.create({
-      data: {
-        name,
-        email,
-        password: hashedPassword,
-        role: "CLIENT",
-        emailVerified: false,
-        verificationCode: code,
-        verificationCodeExpires: expires,
-      },
+    // On stocke la demande en attente (upsert : remplace si déjà une demande en cours pour cet email)
+    await prisma.pendingSignup.upsert({
+      where: { email },
+      create: { email, name, password: hashedPassword, code, expiresAt },
+      update: { name, password: hashedPassword, code, expiresAt },
     });
 
     await sendVerificationEmail(email, code);
 
-    return NextResponse.json(
-      { id: user.id, email: user.email, name: user.name },
-      { status: 201 }
-    );
+    return NextResponse.json({ success: true }, { status: 201 });
   } catch (error) {
     console.error(error);
     return NextResponse.json(
