@@ -1,20 +1,27 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { Search, ShoppingCart, MapPin, User, ShieldCheck, LogOut } from "lucide-react";
 import { CATEGORIES } from "@/lib/constants";
 import { useCart } from "@/store/cart";
 import { useState } from "react";
 
+const HIDDEN_HEADER_ROUTES = ["/login", "/signup"];
+
 export function Header() {
   const router = useRouter();
+  const pathname = usePathname();
   const { data: session } = useSession();
   const { items } = useCart();
   const cartCount = items.reduce((s, i) => s + i.qty, 0);
   const [category, setCategory] = useState("Toutes");
   const [search, setSearch] = useState("");
+
+  if (HIDDEN_HEADER_ROUTES.includes(pathname)) {
+    return null;
+  }
 
   const isAdmin = (session?.user as any)?.role === "ADMIN";
 
@@ -59,13 +66,16 @@ export function Header() {
             {session ? (
               <>
                 <Link href="/account" className="lq-nav-link">
-                  {session.user?.name || session.user?.email}
-                  <small>Compte &amp; commandes</small>
+                  <User size={15} className="lq-nav-link-icon" />
+                  <span className="lq-nav-link-text">
+                    {session.user?.name || session.user?.email}
+                    <small>Compte &amp; commandes</small>
+                  </span>
                 </Link>
                 {isAdmin && (
                   <Link href="/admin" className="lq-nav-link">
-                    <ShieldCheck size={13} style={{ marginRight: 4, verticalAlign: -2 }} />
-                    Admin
+                    <ShieldCheck size={15} className="lq-nav-link-icon" />
+                    <span className="lq-nav-link-text">Admin</span>
                   </Link>
                 )}
                 <button
@@ -79,7 +89,11 @@ export function Header() {
               </>
             ) : (
               <Link href="/login" className="lq-nav-link">
-                Connexion<small>ou créer un compte</small>
+                <User size={15} className="lq-nav-link-icon" />
+                <span className="lq-nav-link-text">
+                  Connexion
+                  <small>ou créer un compte</small>
+                </span>
               </Link>
             )}
             <Link href="/cart" className="lq-icon-btn" aria-label="Panier">

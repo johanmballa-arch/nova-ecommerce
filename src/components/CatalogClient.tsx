@@ -72,11 +72,8 @@ export function CatalogClient({
       </div>
 
       <div className="lq-section-title">
-        <h2 className="lq-display">{category === "Toutes" ? "Tous les résultats" : category}</h2>
-        <span style={{ color: "var(--text-muted)", fontSize: 13.5 }}>
-          {filtered.length} produit{filtered.length > 1 ? "s" : ""}
-        </span>
-      </div>
+  <h2 className="lq-display">{category === "Toutes" ? "Tous les résultats" : category}</h2>
+</div>
 
       <div className="lq-glass lq-filters">
         <div style={{ display: "flex", alignItems: "center", gap: 8, flex: 1, minWidth: 200 }}>
